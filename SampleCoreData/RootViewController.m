@@ -8,6 +8,8 @@
 
 #import "RootViewController.h"
 #import "AppDelegate.h"
+#import "DetailViewController.h"
+#import "Users.h"
 
 @interface RootViewController ()
 
@@ -31,11 +33,11 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *context = [delegate managedObjectContext];
+    self.managedObjectContext = [delegate managedObjectContext];
     
     // Fetch the users from persistent data store
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Users"];
-    self.users = [[context executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    self.users = [[self.managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
     
     [self.tableView reloadData];
 }
@@ -63,31 +65,41 @@
     // Configure the cell...
     NSManagedObject *userObj = [self.users objectAtIndex:indexPath.row];
     [cell.textLabel setText:[NSString stringWithFormat:@"%@ %@", [userObj valueForKey:@"firstName"], [userObj valueForKey:@"lastName"]]];
-    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%@",[userObj valueForKey:@"mobile"]]];
+    [cell.detailTextLabel setText:[[userObj valueForKey:@"mobile"] stringValue]];
     
     return cell;
 }
 
 
-/*
+
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the specified item to be editable.
     return YES;
 }
-*/
 
-/*
+
+
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+        // Delete object from database
+        [self.managedObjectContext deleteObject:[self.users objectAtIndex:indexPath.row]];
+        
+        NSError *error = nil;
+        if (![self.managedObjectContext save:&error]) {
+            NSLog(@"Can't Delete! %@ %@", error, [error localizedDescription]);
+            return;
+        }
+        
+        // Remove device from table view
+        [self.users removeObjectAtIndex:indexPath.row];
+        [self.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }
 }
-*/
+
 
 /*
 // Override to support rearranging the table view.
@@ -103,14 +115,19 @@
 }
 */
 
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
+    if ([[segue identifier] isEqualToString:@"UpdateUser"]) {
+        NSManagedObject *selectedDevice = [self.users objectAtIndex:[[self.tableView indexPathForSelectedRow] row]];
+        DetailViewController *destViewController = segue.destinationViewController;
+        destViewController.userObj = (Users *)selectedDevice;
+    }
 }
-*/
+
 
 @end

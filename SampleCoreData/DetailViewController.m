@@ -18,6 +18,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    if (self.userObj) {
+        [self.firstName setText:[self.userObj valueForKey:@"firstName"]];
+        [self.lastName setText:[self.userObj valueForKey:@"lastName"]];
+        [self.mobileNo setText:[[self.userObj valueForKey:@"mobile"] stringValue]];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -44,11 +49,20 @@
     AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     NSManagedObjectContext *context = [delegate managedObjectContext];
     
-    // Create a new managed object
-    NSManagedObject *userObj = [NSEntityDescription insertNewObjectForEntityForName:@"Users" inManagedObjectContext:context];
-    [userObj setValue:self.firstName.text forKey:@"firstName"];
-    [userObj setValue:self.lastName.text forKey:@"lastName"];
-    [userObj setValue:[NSNumber numberWithInt:[self.mobileNo.text intValue]] forKey:@"mobile"];
+    if (self.userObj) {
+        // Update existing user
+        [self.userObj setValue:self.firstName.text forKey:@"firstName"];
+        [self.userObj setValue:self.lastName.text forKey:@"lastName"];
+        [self.userObj setValue:[NSNumber numberWithInt:[self.mobileNo.text intValue]] forKey:@"mobile"];
+        
+    } else {
+        // Create a new user
+        NSManagedObject *userObj = [NSEntityDescription insertNewObjectForEntityForName:@"Users" inManagedObjectContext:context];
+        [userObj setValue:self.firstName.text forKey:@"firstName"];
+        [userObj setValue:self.lastName.text forKey:@"lastName"];
+        [userObj setValue:[NSNumber numberWithInt:[self.mobileNo.text intValue]] forKey:@"mobile"];
+    }
+    
     
     NSError *error = nil;
     // Save the object to persistent store

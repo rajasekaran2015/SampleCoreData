@@ -11,5 +11,5 @@
 @interface RootViewController : UITableViewController
 
 @property (strong) NSMutableArray *users;
-
+@property (weak) NSManagedObjectContext *managedObjectContext;
 @end

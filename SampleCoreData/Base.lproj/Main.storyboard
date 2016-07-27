@@ -36,6 +36,9 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="IXN-BM-JdP" kind="presentation" identifier="UpdateUser" id="8VZ-ZL-sgA"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -147,4 +150,7 @@
             <point key="canvasLocation" x="-2981" y="30"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="8VZ-ZL-sgA"/>
+    </inferredMetricsTieBreakers>
 </document>

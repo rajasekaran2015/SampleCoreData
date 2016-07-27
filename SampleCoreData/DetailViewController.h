@@ -7,12 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Users.h"
 
 @interface DetailViewController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UITextField *firstName;
 @property (weak, nonatomic) IBOutlet UITextField *lastName;
 @property (weak, nonatomic) IBOutlet UITextField *mobileNo;
+@property (strong) Users *userObj;
 
 - (IBAction)cancel:(id)sender;
 - (IBAction)save:(id)sender;
